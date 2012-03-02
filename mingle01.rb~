@@ -1,0 +1,7 @@
+require 'rubygems'
+require 'mingle4r'
+
+
+m_c = Mingle4r::MingleClient.new('http://mingle01.thoughtworks.com/projects', 'gauravka', 'READ0n1y!808')
+m_c.proj_id = 'devops_india_practice_tracker'
+m_c.cards => array of activeresource objects
