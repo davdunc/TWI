@@ -108,6 +108,16 @@ final =  "Devcloud Report\n\n #{res1}\n #{res2}\n #{res3}\n Total no of Cards= #
 return final
 end
 
+def auth(usr)
+val_user = ['ranjib','nileshb', 'gaurav']
+val_user.each do |n|
+	if n == usr
+	return "Pass"
+	end
+end
+return "Fail"
+end
+
 
 bot = Cinch::Bot.new do
   configure do |c|
@@ -118,6 +128,7 @@ bot = Cinch::Bot.new do
 
   on :message, /^hello+/ do |m|
     m.reply "Hellooooooo, #{m.user.nick}"
+    m.reply m.user.nick
   end
 
   on :message, /^!ticket show (\d+)/ do |m, cnum|
@@ -145,8 +156,13 @@ bot = Cinch::Bot.new do
   end
 
   on :message, /!ticket create (.*)/ do |m, word|
-        wd = create(word)
-        m.reply "#{wd}"
+        check = auth(m.user.nick)
+	if check == "Pass"
+		wd = create(word)
+        	m.reply "#{wd}"
+	else 
+		m.reply "Dont have access to create a card"
+	end
   end
 end 
 
