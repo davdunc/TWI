@@ -123,7 +123,7 @@ bot = Cinch::Bot.new do
   configure do |c|
     c.server = "sifyirc01.thoughtworks.com"
     c.channels = ["#ticket-bot"]
-    c.nick = "devcloud_bot"
+    c.nick = "ticketbot"
   end
 
   on :message, /^hello+/ do |m|
