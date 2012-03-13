@@ -35,7 +35,7 @@ end
 bot = Cinch::Bot.new do
   configure do |c|
     c.server = "sifyirc01.thoughtworks.com"
-    c.channels = ["#ticket-bot"]
+    c.channels = ["#devcloud"]
     c.nick = "meetbot"
   end
 
