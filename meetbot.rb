@@ -42,6 +42,7 @@ bot = Cinch::Bot.new do
   on :message, "!startmeeting" do |m|
     create()
     m.reply "Meeting Started: #{Time.new.to_s}. Chair is: #{m.user.nick}"
+    m.reply "Meeting Commands:\n !topic -to set the meeting topic \n !info -for any relevent discussion regarding meeting\n !action -to set action item\n !endmeeting -to end the meeting"
   end
 
   on :message, /^!topic (.*)/  do |m, topic|

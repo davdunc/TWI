@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'active_resource'
 require 'net/smtp'
+require 'pony'
 
 class Card < ActiveResource::Base
 	self.site='http://mingle01.thoughtworks.com/api/v2/projects/devops_india_practice_tracker'
@@ -72,14 +73,34 @@ p Result2
 p Result3
 p Result4
 
-to_addr = ['devops-in@thoughtworks.com','ranjibd@thoughtworks.com']
-msg ="Subject: Weekly Devcloud Report"+" "+Date.today.to_s+"\n\n #{Result1}\n #{Result2}\n #{Result3}\n Total no of Cards= #{Result4}"
-    smtp = Net::SMTP.new 'smtp.gmail.com', 587
-        smtp.enable_starttls
-            smtp.start('gmail.com', 'gauravka@thoughtworks.com', 'READ0n1y!808', :login) do          
-                  smtp.send_message(msg, 'gauravka@thoughtworks.com', to_addr) 
+#to_addr = ['devops-in@thoughtworks.com','ranjibd@thoughtworks.com']
+#msg ="Subject: Weekly Devcloud Report"+" "+Date.today.to_s+"\n\n #{Result1}\n #{Result2}\n #{Result3}\n Total no of Cards= #{Result4}"
+#    smtp = Net::SMTP.new 'smtp.gmail.com', 587
+#        smtp.enable_starttls
+#            smtp.start('gmail.com', 'gauravka@thoughtworks.com', 'READ0n1y!808', :login) do          
+#                  smtp.send_message(msg, 'gauravka@thoughtworks.com', to_addr) 
         
-end              
+#end              
 
 
+email_data = {
+  :from             =>  'Mailer <mailer@mydomain.com>',
+  :to               =>  'gkasera@gmail.com',
+  :subject          =>  "Weekly Devcloud Report"+" "+Date.today.to_s+".",
+  :body             =>  "#{Result1}\n #{Result2}\n #{Result3}\n Total no of Cards= #{Result4}",
+ # :html_body        =>  haml :email, # render html email using haml
+   :port             =>  '587',
+   :via              =>  :smtp,
+   :via_options      =>  {
+   :address                  =>  'smtp.gmail.com',
+   :port                     =>  '587',
+   :enable_starttls_auto     =>  true,
+   :user_name                =>  'gauravka@thoughtworks.com',
+   :password                 =>  'READ0n1y!808',
+   :authentication           =>  :plain,
+   :domain                   =>  'mydomain.com'
+                         }
+               }
+Pony.mail(email_data)
 
+end
