@@ -4,7 +4,7 @@ require 'fileutils'
 
 def create()
 	$filename = Time.new.to_s.gsub(/\s+/, "-")
-	$path = "/home/gaurav/work/#{$filename}.txt"
+	$path = "/root/meetinglog/#{$filename}.txt"
 	myfile= File.new($path, "w")
 	myfile.puts("Topic:")
 	myfile.puts("Info:")
@@ -34,8 +34,8 @@ end
 
 bot = Cinch::Bot.new do
   configure do |c|
-    c.server = "sifyirc01.thoughtworks.com"
-    c.channels = ["#devcloud"]
+    c.server = "irc.thoughtworks.com"
+    c.channels = ["#devcloud","#devops"]
     c.nick = "meetbot"
   end
 
