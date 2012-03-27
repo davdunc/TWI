@@ -45,19 +45,42 @@ cards= Card.find(:all, :params => {:page => "all"})
 		end
 	end
 
+Result = String.new
 
-Result = "Cards in Analysis = #{a_c} 
-	  Cards ready for Development = #{rd_c} 
-	  Cards in Development = #{id_c}
-          Cards completed = #{dc_c} 
-	  Total no of cards = #{d_c}"
+if a_c != 0
+Result << "Cards in Analysis = #{a_c}\n"
+end
+
+if rd_c != 0
+Result << "Cards ready for Development = #{rd_c}\n"
+end
+
+if id_c != 0
+Result << "Cards in Development = #{id_c}\n"
+end
+
+if d_c != 0
+Result << "Cards Completed = #{dc_c}\n"
+end
+
+Result << "Total no of cards = #{d_c}"
+
+puts Result
+
+#Result = "Cards in Analysis = #{a_c} 
+#	  Cards ready for Development = #{rd_c} 
+#	  Cards in Development = #{id_c}
+#          Cards completed = #{dc_c} 
+
+#  Total no of cards = #{d_c}"
 
 #p Result
-to_addr = ['gkasera@gmail.com', 'gauravka@thoughtworks.com', 'ranjibd@thoughtworks.com']
-msg = "Subject: Weekly Devcloud Issue Report\n\n #{Result}"
-    smtp = Net::SMTP.new 'smtp.gmail.com', 587
-        smtp.enable_starttls
-            smtp.start('gmail.com', 'gauravka@thoughtworks.com', 'READ0n1y!808', :login) do          
-                  smtp.send_message(msg, 'gauravka@thoughtworks.com', to_addr) 
-                      end           
+#to_addr = ['gkasera@gmail.com', 'gauravka@thoughtworks.com', 'ranjibd@thoughtworks.com']
+#msg = "Subject: Weekly Devcloud Issue Report\n\n #{Result}"
+#    smtp = Net::SMTP.new 'smtp.gmail.com', 587
+
+#        smtp.enable_starttls
+#            smtp.start('gmail.com', 'gauravka@thoughtworks.com', 'READ0n1y!808', :login) do          
+#                  smtp.send_message(msg, 'gauravka@thoughtworks.com', to_addr) 
+#                      end           
                                                     
