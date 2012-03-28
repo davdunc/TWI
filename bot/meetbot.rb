@@ -13,25 +13,38 @@ def create()
 	myfile.close
 end
 
-def update(ltf, lta)
-file_path = $path
-line_to_find = ltf
-line_to_add = lta
+$topic_ar = ["TOPIC"]
+$info_ar = ["INFO"]
+$action_ar = ["ACTION"]
 
-temp_file = Tempfile.new(file_path)
-begin
-File.readlines(file_path).each do |line|
-    temp_file.puts(line)
-    if line =~ /^#{ltf}/
-    temp_file.puts(line_to_add)
-    end
-    end
-    temp_file.close
-FileUtils.mv(temp_file.path,file_path)
-ensure
-    temp_file.delete
+def update()
+        myfile = File.open($path, "w+") do |f|
+                f.puts $topic_ar
+                f.puts $info_ar
+                f.puts $action_ar
+        end
 end
-end
+
+#def update(ltf, lta)
+#file_path = $path
+#line_to_find = ltf
+#line_to_add = lta
+
+#temp_file = Tempfile.new(file_path)
+#temp_file.chmod( 0755 )
+#begin
+#File.readlines(file_path).each do |line|
+#    temp_file.puts(line)
+#    if line =~ /^#{ltf}/
+#    temp_file.puts(line_to_add)
+#    end
+#    end
+#    temp_file.close
+#FileUtils.mv(temp_file.path,file_path)
+#ensure
+#    temp_file.delete
+#end
+#end
 
 bot = Cinch::Bot.new do
   configure do |c|
@@ -60,7 +73,8 @@ $mip = false
   on :message, /^!topic (.*)/  do |m, topic|
    	if $mip == true
     	m.reply "Meeting Topic: #{topic}"
-    	update('Topic:', topic)
+#    	update('Topic:', topic)
+	$topic_ar.push(topic)
   	else
    	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
    	end
@@ -69,7 +83,8 @@ $mip = false
   on :message, /^!info (.*)/ do |m, info|
     	if $mip == true
 	inf =  "#{m.user.nick}: #{info}\n"
-    	update('Info:', inf)
+#    	update('Info:', inf)
+	$info_ar.push(inf)
 	else
 	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
 	end
@@ -78,7 +93,8 @@ $mip = false
   on :message, /^!action (.*)/ do |m, action|
 	if $mip == true
 	act = "#{m.user.nick}: #{action}\n"
-   	update('Action:', act)
+#   	update('Action:', act)
+	$action_ar.push(act)
 	else
 	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
 	end
@@ -87,6 +103,7 @@ $mip = false
   on :message, "!endmeeting" do |m|
    # myfile.close
    	if $mip == true
+	update()
     	m.reply "Meeting ends, Minutes are stored as #{$filename}"
     	m.reply "Minutes are located at: http://10.10.101.103/meetinglog/"
         $mip = false
