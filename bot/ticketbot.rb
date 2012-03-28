@@ -10,26 +10,36 @@ class Card < ActiveResource::Base
 end
 
 def ticket(num)
-card_last = Card.find(:first)
-last = card_last.number
-if num.to_i > last.to_i
- return "Card does not exist"
-end
-card = Card.find(num)
+  card_last = Card.find(:first)
+  last = card_last.number
+  if num.to_i > last.to_i
+    return "Card does not exist"
+  end
 
-if (card.card_type.name == "DevCloud Issues")
-	ret =<<-EOF
-		Card No:#{card.number}
-		Name:- #{card.name}
-		Type= #{card.card_type.name}
-		Category= #{card.properties[2].attributes[:value]}
-		Stage= #{card.properties.first.attributes[:value]}
-		EOF
-return ret
-else
-return "Not a DevCloud Issue"
+  begin
+    card = Card.find(num)
+  rescue ActiveResource::ResourceNotFound
+    status=0
+  end
+
+  if status != 0
+    if (card.card_type.name == "DevCloud Issues")
+      ret =<<-EOF
+        Card No:#{card.number}
+        Name:- #{card.name}
+        Type= #{card.card_type.name}
+        Category= #{card.properties[2].attributes[:value]}
+        Stage= #{card.properties.first.attributes[:value]}
+      EOF
+      return ret
+    else
+      return "Not a DevCloud Issue"
+    end
+  else
+    return "Card Not Found"
+  end
 end
-end
+
 def new()
 
 end
@@ -121,18 +131,23 @@ end
 
 bot = Cinch::Bot.new do
   configure do |c|
-    c.server = "sifyirc01.thoughtworks.com"
-    c.channels = ["#ticket-bot"]
+    c.server = "irc.thoughtworks.com"
+    c.channels = ["#devcloud","#devops"]
     c.nick = "ticketbot"
   end
 
   on :message, /^hello+/ do |m|
     m.reply "Hellooooooo, #{m.user.nick}"
-    m.reply m.user.nick
   end
 
+  on :message, "!ticket help" do |m|
+    m.reply "Hellooooooo, #{m.user.nick}"
+    m.reply "!ticket show : to show ticket details \n !ticket show all: total no of DevCloud Issues \n !ticket create : to create a new card \n !ticket report: Show the complete stats for all DevCloud isses \n !ticket category: Shows the stats for a particular category"
+  end  
+
   on :message, /^!ticket show (\d+)/ do |m, cnum|
-  val = ticket(cnum)
+   m.reply "Please wait... getting card details"
+   val = ticket(cnum)
    m.reply "#{val}"
   end
 
@@ -142,15 +157,18 @@ bot = Cinch::Bot.new do
   end
  
   on :message, /^!ticket category (\w+\/\w+)/ do |m, tcat|
-         t_cat = countc(tcat)
+         m.reply "Please wait... getting card details" 
+	 t_cat = countc(tcat)
          m.reply "#{t_cat}"
   end
   on :message, /^!ticket category (\w+ \w+)/ do |m, tcat|
-         t_cat = countc(tcat)
+         m.reply "Please wait... getting card details"
+	 t_cat = countc(tcat)
          m.reply "#{t_cat}"
   end
 
   on :message, "!ticket report" do |m|
+	m.reply "Please wait... getting card details"
 	dc_report = report()
 	m.reply "DevCloud Issues Report = #{dc_report}"
   end

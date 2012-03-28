@@ -41,12 +41,23 @@ cards.each do |card|
 	d_c = d_c + 1
 	end
 end
-result = "For "+category+"
-          Cards in Analysis = #{a_c} 
-          Cards ready for Development = #{rd_c} 
-          Cards in Development = #{id_c}
-          Cards completed = #{dc_c} 
-          Total no of cards = #{d_c}"
+
+
+result = "For "+category+":\n"
+
+	if a_c != 0
+	result << "Cards in Analysis = #{a_c}\n"
+	end
+	if rd_c != 0
+	result << "Cards ready for Development = #{rd_c}\n"
+	end
+	if id_c != 0
+	result << "Cards in Development = #{id_c}\n"
+	end
+	if d_c != 0
+	result << "Cards Completed = #{dc_c}\n"
+	end
+	result << "Total no of cards = #{d_c}\n\n"
 
 return result
 
@@ -68,10 +79,10 @@ Result3 = count('Update/Upgrade')
 Result4 = count
 
 
-p Result1
-p Result2
-p Result3
-p Result4
+#p Result1
+#p Result2
+#p Result3
+#p Result4
 
 #to_addr = ['devops-in@thoughtworks.com','ranjibd@thoughtworks.com']
 #msg ="Subject: Weekly Devcloud Report"+" "+Date.today.to_s+"\n\n #{Result1}\n #{Result2}\n #{Result3}\n Total no of Cards= #{Result4}"
@@ -84,8 +95,8 @@ p Result4
 
 
 email_data = {
-  :from             =>  'Mailer <mailer@mydomain.com>',
-  :to               =>  'gkasera@gmail.com',
+  :from             =>  'Gaurav Kasera <gauravka@thoughtworks.com>',
+  :to               =>  'devops-in@thoughtworks.com',
   :subject          =>  "Weekly Devcloud Report"+" "+Date.today.to_s+".",
   :body             =>  "#{Result1}\n #{Result2}\n #{Result3}\n Total no of Cards= #{Result4}",
  # :html_body        =>  haml :email, # render html email using haml
@@ -103,4 +114,3 @@ email_data = {
                }
 Pony.mail(email_data)
 
-end
