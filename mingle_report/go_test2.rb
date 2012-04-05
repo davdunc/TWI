@@ -40,31 +40,7 @@ Pipeline_2.delete_if{|pipe, stage| !p_name.include? pipe}
      source = open(stages_url, :http_basic_authentication=>["gauravka", "READ0n1y!808"])
      str = source.read
      @stages_doc =  Nokogiri::XML(str)
-    			stg_link = []
-     			@stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href").each do |link|
-          stg_link.push(link)
-          end
-
-     			stg_up = []
-     			@stages_doc.xpath("//xmlns:entry/xmlns:updated").each do |date|
-          stg_up.push(Time.parse(date.text()))
-     			end
-     			
-					Stage_hash = Hash[stg_link.zip(stg_up)]
-					pipeline_link = []
-					Stage_hash.each do |stg,time|
-  						t1 = Time.now
-  						t2 = time
-  						if ((t1-t2)<= 86400)
-   							pipeline_link.push(stg)
-  						end
-					end
-					Stage_hash.clear
-
-#			  pipeline_link = @stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href")#.text()
-#				stg_up = @stages_doc.xpath("//xmlns:entry/xmlns:updated").text
-				
-
+     pipeline_link = @stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href")#.text()
 		 		pipeline_link.each do |pl|
 				stage_detail = open(pl, :http_basic_authentication=>["gauravka", "READ0n1y!808"]).read 
 				job_doc = Nokogiri::XML(stage_detail)
@@ -95,14 +71,7 @@ Pipeline_2.delete_if{|pipe, stage| !p_name.include? pipe}
 						completion = Time.parse(end_time) - Time.parse(c_t)
 						t_period = Time.parse(end_time) - Time.parse(s_t)
 						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{t_period.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{scheduling.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{assignment.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{preparation.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{building.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{completion.to_i}"+"."+"#{Time.parse(s_t).to_i}"
 						end
-						Stage_hash.clear
 				end
-				
    end
 
