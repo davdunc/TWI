@@ -58,10 +58,15 @@ $mip = false
     	if $mip == false
     	create()
     	m.reply "Meeting Started: #{Time.new.to_s}. Chair is: #{m.user.nick}"
-    	m.reply "Meeting Commands:\n !topic -to set the meeting topic \n !info -for any relevent discussion regarding meeting\n !action -to set action item\n !endmeeting -to end the meeting"
+    	m.reply "Meeting Commands:
+!topic :: To set the meeting topic;
+!info/!i :: For any relevent discussion regarding meeting;
+!action/!a :: To set action items; 
+!endmeeting/!em :: To end meeting"
+
     	$mip = true
     	else 
-    	m.reply "!!ERROR::One meeting is already running, please do !ticket help for more options."
+    	m.reply "!!ERROR::One meeting is already running, please do !meeting help for more options."
     	end
   end
 
@@ -69,16 +74,26 @@ $mip = false
         if $mip == false
         create()
         m.reply "Meeting Started: #{Time.new.to_s}. Chair is: #{m.user.nick}"
-        m.reply "Meeting Commands:\n !topic -to set the meeting topic \n !info -for any relevent discussion regarding meeting\n !action -to set action item\n !endmeeting -to end the meeting"
-        $mip = true
+        m.reply "Meeting Commands:
+!topic :: To set the meeting topic;
+!info/!i :: For any relevent discussion regarding meeting;
+!action/!a :: To set action items; 
+!endmeeting/!em :: To end meeting"
+
+	$mip = true
         else
-        m.reply "!!ERROR::One meeting is already running, please do !ticket help for more options."
+        m.reply "!!ERROR::One meeting is already running, please do !meeting help for more options."
         end
   end
 
 
   on :message, "!meeting help" do |m|
-    m.reply "Meeting Commands:\n!startmeeting - to start the meeting \n !topic -to set the meeting topic \n !info -for any relevent discussion regarding meeting\n !action -to set action item\n !endmeeting -to end the meeting"
+    m.reply "!startmeeting/!sm :: To start the meeting;
+!topic :: To set the meeting topic;
+!info/!i :: For any relevent discussion regarding meeting;
+!action/!a :: To set action items; 
+!endmeeting/!em :: To end meeting."
+
   end
 
   on :message, /^!topic (.*)/  do |m, topic|
@@ -87,7 +102,7 @@ $mip = false
 #    	update('Topic:', topic)
 	$topic_ar.push(topic)
   	else
-   	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+   	m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
    	end
   end
 
@@ -97,7 +112,7 @@ $mip = false
 #    	update('Info:', inf)
 	$info_ar.push(inf)
 	else
-	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+	m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
 	end
   end
   on :message, /^!i (.*)/ do |m, info|
@@ -105,7 +120,7 @@ $mip = false
         inf =  "#{m.user.nick}: #{info}\n"
         $info_ar.push(inf)
         else
-        m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+        m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
         end
    end  
 
@@ -115,7 +130,7 @@ $mip = false
 #   	update('Action:', act)
 	$action_ar.push(act)
 	else
-	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+	m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
 	end
   end 
   on :message, /^!a (.*)/ do |m, action|
@@ -123,7 +138,7 @@ $mip = false
         act = "#{m.user.nick}: #{action}\n"
         $action_ar.push(act)
         else
-        m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+        m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
         end
   end
 
@@ -132,10 +147,10 @@ $mip = false
    	if $mip == true
 	update()
     	m.reply "Meeting ends, Minutes are stored as #{$filename}"
-    	m.reply "Minutes are located at: http://10.10.101.103/meetinglog/"
+    	m.reply "Minutes are located at: http://talk.thoughtworks.com/meetinglog/"
         $mip = false
 	else
-	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
+	m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
 	end
   end 
 
@@ -144,7 +159,7 @@ $mip = false
    	if $mip == true
 	update()
     	m.reply "Meeting ends, Minutes are stored as #{$filename}"
-    	m.reply "Minutes are located at: http://10.10.101.103/meetinglog/"
+    	m.reply "Minutes are located at: http://talk.thoughtworks.com/meetinglog/"
         $mip = false
 	else
 	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."

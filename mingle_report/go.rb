@@ -1,9 +1,13 @@
 require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
-require 'active_resource'
-require 'net/http'
+#require 'active_resource'
+#require 'net/http'
 require 'time'
+#require 'american_date'
+require 'simple-graphite'
+
+g_client=Graphite.new({:host=>'10.10.101.54',:port=>2003})
 
 pipeline_url = open("http://vm100-004.sc01.thoughtworks.com:8153/go/cctray.xml", :http_basic_authentication => ["gauravka", "READ0n1y!808"])
 doc = Nokogiri::XML(pipeline_url.read)
@@ -33,76 +37,73 @@ Pipeline_1.each do |pipeline_name,time|
 end
 
 Pipeline_2.delete_if{|pipe, stage| !p_name.include? pipe}
-
-	Pipeline_2.each do |pipe, stage|
-     stages_prefix = "http://vm100-004.sc01.thoughtworks.com:8153/go/api/pipelines/"
-     stages_url = stages_prefix + "#{pipe}" + "/stages.xml" 
-     source = open(stages_url, :http_basic_authentication=>["gauravka", "READ0n1y!808"])
-     str = source.read
-     @stages_doc =  Nokogiri::XML(str)
-    			stg_link = []
-     			@stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href").each do |link|
-          stg_link.push(link)
-          end
-
-     			stg_up = []
-     			@stages_doc.xpath("//xmlns:entry/xmlns:updated").each do |date|
+Pipeline_2.each do |pipe, stage|
+	stages_prefix = "http://vm100-004.sc01.thoughtworks.com:8153/go/api/pipelines/"
+     	stages_url = stages_prefix + "#{pipe}" + "/stages.xml" 
+     	source = open(stages_url, :http_basic_authentication=>["gauravka", "READ0n1y!808"])
+     	str = source.read
+     	@stages_doc =  Nokogiri::XML(str)
+    	stg_link = []
+    	@stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href").each do |link|
+        stg_link.push(link)
+        end
+     	stg_up = []
+     	@stages_doc.xpath("//xmlns:entry/xmlns:updated").each do |date|
           stg_up.push(Time.parse(date.text()))
-     			end
-     			
-					Stage_hash = Hash[stg_link.zip(stg_up)]
-					pipeline_link = []
-					Stage_hash.each do |stg,time|
-  						t1 = Time.now
-  						t2 = time
-  						if ((t1-t2)<= 86400)
-   							pipeline_link.push(stg)
-  						end
-					end
-					Stage_hash.clear
-
-#			  pipeline_link = @stages_doc.xpath("//xmlns:entry/xmlns:link[@rel='alternate' and @type='application/vnd.go+xml']/@href")#.text()
-#				stg_up = @stages_doc.xpath("//xmlns:entry/xmlns:updated").text
-				
-
-		 		pipeline_link.each do |pl|
-				stage_detail = open(pl, :http_basic_authentication=>["gauravka", "READ0n1y!808"]).read 
-				job_doc = Nokogiri::XML(stage_detail)
-				job_link = job_doc.xpath("//jobs/job/@href")
-				job_link.each do |jl|
-
-						job_detail = open(jl, :http_basic_authentication=>["gauravka", "READ0n1y!808"]).read
-      			j_doc = Nokogiri::XML(job_detail)
-						s_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_01_scheduled']").text
-						a_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_02_assigned']").text
-						p_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_03_preparing']").text
-						b_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_04_building']").text
-						c_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_05_completing']").text
-						end_time = j_doc.xpath("//properties/property[@name='cruise_timestamp_06_completed']").text
-						job = j_doc.xpath("//job/@name")
-						stg = j_doc.xpath("//stage/@name")
-						cnt = j_doc.xpath("//stage/@counter")
-						agent = j_doc.xpath("//properties/property[@name='cruise_agent']").text
-#						job_name = job[@name]
-#						puts "-------------------------------------------------"
-#						puts job
-#						puts "-------------------------------------------------"
-#						puts j_doc.job[@name]	
-						scheduling = Time.parse(a_t) - Time.parse(s_t)
-						assignment = Time.parse(p_t) - Time.parse(a_t)
-						preparation = Time.parse(b_t) - Time.parse(p_t)
-						building = Time.parse(c_t) - Time.parse(b_t)
-						completion = Time.parse(end_time) - Time.parse(c_t)
-						t_period = Time.parse(end_time) - Time.parse(s_t)
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{t_period.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{scheduling.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{assignment.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{preparation.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{building.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						puts "#{pipe.downcase}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"+"."+"#{completion.to_i}"+"."+"#{Time.parse(s_t).to_i}"
-						end
-						Stage_hash.clear
-				end
-				
-   end
+     	  end
+	stage_hash = Hash[stg_link.zip(stg_up)]
+	pipeline_link = []
+	stage_hash.each do |stg,time|
+  	   t1 = Time.now
+  	   t2 = time
+  	   if ((t1-t2)<= 86400)
+   		pipeline_link.push(stg)
+  	   end
+	end
+	stage_hash.clear	
+	pipeline_link.each do |pl|
+	stage_detail = open(pl, :http_basic_authentication=>["gauravka", "READ0n1y!808"]).read 
+	job_doc = Nokogiri::XML(stage_detail)
+	job_link = job_doc.xpath("//jobs/job/@href")
+	job_link.each do |jl|
+		job_detail = open(jl, :http_basic_authentication=>["gauravka", "READ0n1y!808"]).read
+		j_doc = Nokogiri::XML(job_detail)
+		s_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_01_scheduled']").text
+		a_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_02_assigned']").text
+		p_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_03_preparing']").text
+		b_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_04_building']").text
+		c_t = j_doc.xpath("//properties/property[@name='cruise_timestamp_05_completing']").text
+		end_time = j_doc.xpath("//properties/property[@name='cruise_timestamp_06_completed']").text
+		job = j_doc.xpath("//job/@name")
+		stg = j_doc.xpath("//stage/@name")
+		cnt = j_doc.xpath("//stage/@counter")
+		agent_tmp = j_doc.xpath("//properties/property[@name='cruise_agent']").text
+		agent = agent_tmp.gsub(/\./, "_")
+		scheduling = (Time.parse(a_t) - Time.parse(s_t)).to_i
+		assignment = (Time.parse(p_t) - Time.parse(a_t)).to_i
+		preparation = (Time.parse(b_t) - Time.parse(p_t)).to_i
+		building = (Time.parse(c_t) - Time.parse(b_t)).to_i
+		completion = (Time.parse(end_time) - Time.parse(c_t)).to_i
+		t_period = (Time.parse(end_time) - Time.parse(s_t)).to_i 
+		lpipe=pipe.downcase
+		metric = "#{lpipe}"+"."+"#{stg.to_s.downcase}"+"_"+"#{cnt}"+"."+"#{job}"+"."+"#{agent}"
+		timestamp = "#{Time.parse(s_t).to_i}" 
+		g_client.push_to_graphite do |socket|
+			socket.puts metric +"."+"total"+" "+"#{t_period}"+" "+ timestamp
+			socket.puts metric +"."+"scheduling"+" "+"#{scheduling}"+" "+timestamp
+			socket.puts  metric +"."+"assignment"+" "+"#{assignment}"+" "+timestamp
+			socket.puts  metric +"."+"preparation"+" "+"#{preparation}"+" "+timestamp
+			socket.puts  metric +"."+"building"+" "+"#{building}"+" "+timestamp
+			socket.puts  metric +"."+"completion"+" "+"#{completion}"+" "+timestamp
+#			puts  metric +"."+"total"+" "+"#{t_period}"+" "+ timestamp
+#			puts  metric +"."+"scheduling"+" "+"#{scheduling}"+" "+timestamp
+#			puts  metric +"."+"assignment"+" "+"#{assignment}"+" "+timestamp
+#			puts  metric +"."+"preparation"+" "+"#{preparation}"+" "+timestamp
+#			puts  metric +"."+"building"+" "+"#{building}"+" "+timestamp
+#			puts  metric +"."+"completion"+" "+"#{completion}"+" "+timestamp
+			end
+		end
+	 end
+#	 Stage_hash.clear	
+end
 
