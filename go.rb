@@ -10,28 +10,36 @@ require 'net/http'
 #GoApiClient.runs('10.10.100.51:8153')
 
 
-#class PipelineXMLFormatter
-#  include ActiveResource::Formats::XmlFormat
+class PipelineXMLFormatter
+  include ActiveResource::Formats::XmlFormat
 
-#  def decode(xml)
-#    ActiveSupport::XmlMini.decode(xml)["pipeline"]
-#  end
+  def decode(xml)
+    ActiveSupport::XmlMini.decode(xml)["pipeline"]
+  end
+end
+
+
+
+
+#class Pipeline < ActiveResource::Base
+#	self.site='http://vm100-004.sc01.thoughtworks.com:8153/go/api'
+#        self.user='pratima'
+#	self.password= ')3vcl0u)K@rm'
+#	self.element_name= "pipeline"
+#	self.format=PipelineXMLFormatter.new
 #end
 
-
-
-
 class Pipeline < ActiveResource::Base
-	self.site='http://vm100-004.sc01.thoughtworks.com:8153/go/api'
+	self.site='http://vm100-004.sc01.thoughtworks.com:8153/go/api/'
         self.user='pratima'
 	self.password= ')3vcl0u)K@rm'
-	self.element_name= "pipeline"
-	self.format=PipelineXMLFormatter.new
+#	self.element_name= "pipeline"
+	self.format=:xml
 end
 
 ActiveResource::Base.logger = Logger.new(STDOUT)
 
-pipe = Pipeline.find(:all, :params => {:pipeline => 'VodQaTeam1'})
+pipe = Pipeline.get(:stages)#"VodQaTeam1")
 
 #go=Pipeline.new({:pipeline_name => 'Test1'})
 
