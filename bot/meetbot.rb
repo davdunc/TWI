@@ -1,6 +1,7 @@
 require 'cinch'
 require 'tempfile'
 require 'fileutils'
+require 'socket'
 
 def create()
 	$filename = Time.new.to_s.gsub(/\s+/, "-")
@@ -24,27 +25,6 @@ def update()
         end
 end
 
-#def update(ltf, lta)
-#file_path = $path
-#line_to_find = ltf
-#line_to_add = lta
-
-#temp_file = Tempfile.new(file_path)
-#temp_file.chmod( 0755 )
-#begin
-#File.readlines(file_path).each do |line|
-#    temp_file.puts(line)
-#    if line =~ /^#{ltf}/
-#    temp_file.puts(line_to_add)
-#    end
-#    end
-#    temp_file.close
-#FileUtils.mv(temp_file.path,file_path)
-#ensure
-#    temp_file.delete
-#end
-#end
-
 bot = Cinch::Bot.new do
   configure do |c|
     c.server = "irc.thoughtworks.com"
@@ -53,7 +33,7 @@ bot = Cinch::Bot.new do
   end
 
 $mip = false
-
+$host = Socket.gethostname		#hostname of the box
   on :message, "!startmeeting" do |m|
     	if $mip == false
     	create()
@@ -147,7 +127,7 @@ $mip = false
    	if $mip == true
 	update()
     	m.reply "Meeting ends, Minutes are stored as #{$filename}"
-    	m.reply "Minutes are located at: http://talk.thoughtworks.com/meetinglog/"
+    	m.reply "Minutes are located at: http://#{$host}/meetinglog/"
         $mip = false
 	else
 	m.reply "!!ERROR: No meeting running, please do !meeting help for more options."
@@ -159,7 +139,7 @@ $mip = false
    	if $mip == true
 	update()
     	m.reply "Meeting ends, Minutes are stored as #{$filename}"
-    	m.reply "Minutes are located at: http://talk.thoughtworks.com/meetinglog/"
+    	m.reply "Minutes are located at: http://#{$host}/meetinglog/"
         $mip = false
 	else
 	m.reply "!!ERROR: No meeting running, please do !ticket help for more options."
